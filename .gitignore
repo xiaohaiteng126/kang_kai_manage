@@ -15,7 +15,7 @@ node_modules/
 dist/
 *.local
 
-# ====== IDE ======
+# ====== IDE / Config ======
 .idea/
 *.iml
 *.iws
@@ -24,6 +24,7 @@ dist/
 *.swp
 *.swo
 *~
+.claude/
 
 # ====== OS ======
 .DS_Store
