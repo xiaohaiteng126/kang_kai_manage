@@ -1,0 +1,27 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #app {
+  height: 100%;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+  background-color: #f0f2f5;
+}
+
+/* 所有表格表头和单元格居中 */
+.el-table th.el-table__cell,
+.el-table td.el-table__cell {
+  text-align: center !important;
+}
+
+/* 表格边框颜色 */
+.el-table--border {
+  --el-table-border-color: #b8bcc2;
+}
+
+
+
+
+

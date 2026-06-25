@@ -1,16 +1,5 @@
-# Compiled class file
+# ====== Java / Maven ======
 *.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
 *.jar
 *.war
 *.nar
@@ -18,7 +7,40 @@
 *.zip
 *.tar.gz
 *.rar
+target/
+!.mvn/wrapper/maven-wrapper.jar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# ====== Node / Vite ======
+node_modules/
+dist/
+*.local
+
+# ====== IDE ======
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.swp
+*.swo
+*~
+
+# ====== OS ======
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ====== Logs ======
+*.log
+logs/
+
+# ====== Environment ======
+.env
+.env.local
+.env.*.local
+
+# ====== Misc ======
+*.ctxt
+.mtj.tmp/
 hs_err_pid*
 replay_pid*

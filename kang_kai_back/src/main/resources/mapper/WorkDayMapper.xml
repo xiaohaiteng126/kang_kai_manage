@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kangkai.mapper.WorkDayMapper">
+
+    <insert id="upsert">
+        INSERT INTO work_day (employee_id, project_id, `year_month`, work_days,
+            piece_pay, loan, fine, tools_other, remark)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.employeeId}, #{item.projectId}, #{item.yearMonth}, #{item.workDays},
+             #{item.piecePay}, #{item.loan}, #{item.fine}, #{item.toolsOther}, #{item.remark})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+            work_days = VALUES(work_days),
+            piece_pay = VALUES(piece_pay),
+            loan = VALUES(loan),
+            fine = VALUES(fine),
+            tools_other = VALUES(tools_other),
+            remark = VALUES(remark)
+    </insert>
+
+</mapper>
