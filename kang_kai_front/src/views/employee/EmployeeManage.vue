@@ -38,13 +38,13 @@
       <el-table-column prop="phone" label="手机号" width="130" />
       <el-table-column prop="bankCard" label="银行卡号" width="170" />
       <el-table-column prop="idCard" label="身份证号" width="180" />
-      <el-table-column prop="address" label="地址" min-width="150" show-overflow-tooltip />
+      <el-table-column prop="address" label="地址" min-width="120" show-overflow-tooltip />
       <el-table-column label="状态" width="80">
         <template #default="{ row }">
           <el-tag :type="row.status === '在项' ? 'success' : 'warning'" size="small">{{ row.status }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="150" fixed="right">
+      <el-table-column label="操作" width="150">
         <template #default="{ row }">
           <el-button type="primary" text size="small" @click="handleEdit(row)">编辑</el-button>
           <el-button type="danger" text size="small" @click="handleDelete(row)">删除</el-button>

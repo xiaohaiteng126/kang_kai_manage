@@ -8,7 +8,7 @@
       <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="projectName" label="项目名称" />
       <el-table-column prop="createTime" label="创建时间" width="180" />
-      <el-table-column label="操作" width="180" fixed="right">
+      <el-table-column label="操作" width="180">
         <template #default="{ row }">
           <el-button type="primary" text size="small" @click="handleEdit(row)">编辑</el-button>
           <el-button type="danger" text size="small" @click="handleDelete(row)">删除</el-button>

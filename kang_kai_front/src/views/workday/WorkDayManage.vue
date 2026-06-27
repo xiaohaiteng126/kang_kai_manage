@@ -21,7 +21,7 @@
 
     <!-- Dynamic Table -->
     <div style="overflow-x: auto" v-loading="loading">
-      <el-table :data="pagedData" border style="min-width: 100%" v-if="months.length > 0"
+      <el-table :data="pagedData" border style="width: 100%" v-if="months.length > 0"
         :header-cell-style="{ textAlign: 'center' }">
         <!-- Fixed columns -->
         <el-table-column type="index" label="序号" width="60" fixed="left" />
@@ -67,7 +67,7 @@
                   style="width: 100%" />
               </template>
             </el-table-column>
-            <el-table-column label="工具/其他" width="130">
+            <el-table-column label="工具/其他" min-width="100">
               <template #default="{ row }">
                 <el-input-number
                   v-model="row[`${month}_toolsOther`]"
@@ -76,7 +76,7 @@
                   style="width: 100%" />
               </template>
             </el-table-column>
-            <el-table-column label="备注" width="160">
+            <el-table-column label="备注" min-width="120">
               <template #default="{ row }">
                 <el-input v-model="row[`${month}_remark`]" size="small" placeholder="备注" />
               </template>
@@ -111,7 +111,7 @@ const projectId = ref('')
 const now = new Date()
 const currentYear = now.getFullYear()
 const currentMonth = String(now.getMonth() + 1).padStart(2, '0')
-const startMonth = ref(`${currentYear}-01`)
+const startMonth = ref(`${currentYear}-${currentMonth}`)
 const endMonth = ref(`${currentYear}-${currentMonth}`)
 const loading = ref(false)
 const saving = ref(false)
