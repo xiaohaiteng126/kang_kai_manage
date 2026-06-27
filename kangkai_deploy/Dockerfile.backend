@@ -1,0 +1,9 @@
+# 后端 Dockerfile
+FROM openjdk:8-jre-slim
+
+WORKDIR /app
+COPY kang-kai-back-1.0.0.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-Xms256m", "-Xmx512m", "-jar", "app.jar"]

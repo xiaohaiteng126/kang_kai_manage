@@ -40,6 +40,11 @@ logs/
 .env.local
 .env.*.local
 
+# ====== Deploy ======
+kangkai_deploy/*.jar
+kangkai_deploy/dist.tar.gz
+kangkai_deploy/dist/
+
 # ====== Misc ======
 *.ctxt
 .mtj.tmp/
