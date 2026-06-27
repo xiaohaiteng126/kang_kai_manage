@@ -13,7 +13,7 @@
       <el-form-item label="结束月份">
         <el-date-picker v-model="endMonth" type="month" format="YYYY-MM" value-format="YYYY-MM" placeholder="结束月份" />
       </el-form-item>
-      <el-form-item>
+      <el-form-item style="float: right">
         <el-button type="primary" @click="handleQuery" :disabled="!projectId || !startMonth || !endMonth">查询</el-button>
         <el-button type="warning" @click="handleExport" :disabled="!rows.length">导出Excel</el-button>
       </el-form-item>
@@ -21,10 +21,12 @@
 
     <!-- Read-only Table -->
     <div style="overflow-x: auto" v-loading="loading">
-      <el-table :data="pagedData" border v-if="months.length > 0" show-summary :summary-method="getSummaries"
-        :header-cell-style="{ textAlign: 'center' }">
+      <el-table :data="displayData" border v-if="months.length > 0"
+        :header-cell-style="{ textAlign: 'center' }" :row-class-name="rowClassName">
         <!-- Fixed left columns -->
-        <el-table-column type="index" label="序号" width="60" fixed="left" />
+        <el-table-column label="序号" width="60" fixed="left">
+          <template #default="{ row }">{{ row._summary ? '' : row.rowNo }}</template>
+        </el-table-column>
         <el-table-column prop="employeeName" label="姓名" width="100" fixed="left" />
         <el-table-column label="总工日" width="90">
           <template #default="{ row }">{{ formatNum(row.totalWorkDays) }}</template>
@@ -78,7 +80,8 @@
         </el-table-column>
         <el-table-column label="备注" width="180">
           <template #default="{ row }">
-            <el-input v-model="row.remark" size="small" placeholder="可编辑备注" @blur="handleRemarkBlur(row)" />
+            <template v-if="row._summary"></template>
+            <el-input v-else v-model="row.remark" size="small" placeholder="可编辑备注" @blur="handleRemarkBlur(row)" />
           </template>
         </el-table-column>
       </el-table>
@@ -115,12 +118,64 @@ const loading = ref(false)
 const months = ref([])
 const rows = ref([])
 const pageNum = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(10)
 const total = ref(0)
 const pagedData = computed(() => {
   const start = (pageNum.value - 1) * pageSize.value
   return rows.value.slice(start, start + pageSize.value)
 })
+
+const summaryRow = computed(() => {
+  const data = pagedData.value
+  if (!data.length) return null
+  const row = { _summary: true, rowNo: '', employeeName: '合计' }
+  row.totalWorkDays = Number(data.reduce((s, r) => s + Number(r.totalWorkDays || 0), 0).toFixed(1))
+  row.dailyWage = null
+  row.totalPiecePay = Number(data.reduce((s, r) => s + Number(r.totalPiecePay || 0), 0).toFixed(2))
+  row.months = months.value.map(m => {
+    return {
+      yearMonth: m,
+      workDays: data.reduce((s, r) => {
+        const md = (r.months || []).find(d => d.yearMonth === m)
+        return s + Number(md ? md.workDays || 0 : 0)
+      }, 0),
+      piecePay: data.reduce((s, r) => {
+        const md = (r.months || []).find(d => d.yearMonth === m)
+        return s + Number(md ? md.piecePay || 0 : 0)
+      }, 0),
+      loan: data.reduce((s, r) => {
+        const md = (r.months || []).find(d => d.yearMonth === m)
+        return s + Number(md ? md.loan || 0 : 0)
+      }, 0),
+      fine: data.reduce((s, r) => {
+        const md = (r.months || []).find(d => d.yearMonth === m)
+        return s + Number(md ? md.fine || 0 : 0)
+      }, 0),
+      toolsOther: data.reduce((s, r) => {
+        const md = (r.months || []).find(d => d.yearMonth === m)
+        return s + Number(md ? md.toolsOther || 0 : 0)
+      }, 0),
+      remark: ''
+    }
+  })
+  row.totalLoan = data.reduce((s, r) => s + Number(r.totalLoan || 0), 0)
+  row.totalFine = data.reduce((s, r) => s + Number(r.totalFine || 0), 0)
+  row.totalToolsOther = data.reduce((s, r) => s + Number(r.totalToolsOther || 0), 0)
+  row.balance = data.reduce((s, r) => s + Number(r.balance || 0), 0)
+  row.signature = ''
+  row.remark = ''
+  return row
+})
+
+const displayData = computed(() => {
+  const data = [...pagedData.value]
+  if (summaryRow.value) data.push(summaryRow.value)
+  return data
+})
+
+function rowClassName({ row }) {
+  return row._summary ? 'summary-row' : ''
+}
 
 onMounted(async () => {
   const res = await listProjects()
@@ -202,50 +257,4 @@ async function handleRemarkBlur(row) {
   }
 }
 
-function getSummaries() {
-  const data = rows.value
-  if (!data.length) return []
-
-  const sums = ['合计', ''] // 序号, 姓名
-
-  // 总工日, 日资(不合计), 总计件
-  sums.push(data.reduce((s, r) => s + Number(r.totalWorkDays || 0), 0).toFixed(1))
-  sums.push('')
-  sums.push(data.reduce((s, r) => s + Number(r.totalPiecePay || 0), 0).toFixed(2))
-
-  // Month sub-columns
-  months.value.forEach(m => {
-    sums.push(data.reduce((s, r) => {
-      const md = (r.months || []).find(d => d.yearMonth === m)
-      return s + Number(md ? md.workDays || 0 : 0)
-    }, 0).toFixed(1))
-    sums.push(data.reduce((s, r) => {
-      const md = (r.months || []).find(d => d.yearMonth === m)
-      return s + Number(md ? md.piecePay || 0 : 0)
-    }, 0).toFixed(2))
-    sums.push(data.reduce((s, r) => {
-      const md = (r.months || []).find(d => d.yearMonth === m)
-      return s + Number(md ? md.loan || 0 : 0)
-    }, 0).toFixed(2))
-    sums.push(data.reduce((s, r) => {
-      const md = (r.months || []).find(d => d.yearMonth === m)
-      return s + Number(md ? md.fine || 0 : 0)
-    }, 0).toFixed(2))
-    sums.push(data.reduce((s, r) => {
-      const md = (r.months || []).find(d => d.yearMonth === m)
-      return s + Number(md ? md.toolsOther || 0 : 0)
-    }, 0).toFixed(2))
-    sums.push('') // 月备注
-  })
-
-  // 总借支, 总罚款, 工具/其他, 余额, 签字, 备注
-  sums.push(data.reduce((s, r) => s + Number(r.totalLoan || 0), 0).toFixed(2))
-  sums.push(data.reduce((s, r) => s + Number(r.totalFine || 0), 0).toFixed(2))
-  sums.push(data.reduce((s, r) => s + Number(r.totalToolsOther || 0), 0).toFixed(2))
-  sums.push(data.reduce((s, r) => s + Number(r.balance || 0), 0).toFixed(2))
-  sums.push('')
-  sums.push('')
-
-  return sums
-}
 </script>

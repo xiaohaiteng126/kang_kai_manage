@@ -149,7 +149,7 @@ const tableData = ref([])
 const projects = ref([])
 const loading = ref(false)
 const pageNum = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(10)
 const total = ref(0)
 
 const searchForm = reactive({

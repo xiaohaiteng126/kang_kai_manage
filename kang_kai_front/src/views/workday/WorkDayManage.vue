@@ -13,7 +13,7 @@
       <el-form-item label="结束月份">
         <el-date-picker v-model="endMonth" type="month" format="YYYY-MM" value-format="YYYY-MM" placeholder="结束月份" />
       </el-form-item>
-      <el-form-item>
+      <el-form-item style="float: right">
         <el-button type="primary" @click="handleQuery" :disabled="!projectId || !startMonth || !endMonth">查询</el-button>
         <el-button type="success" @click="handleSave" :disabled="!tableData.length" :loading="saving">保存</el-button>
       </el-form-item>
@@ -37,7 +37,7 @@
                   v-model="row[`${month}_workDays`]"
                   :min="0" :max="99" :precision="1"
                   size="small" controls-position="right"
-                  style="width: 100%" />
+                  style="width: 100%" @change="dirty = true" />
               </template>
             </el-table-column>
             <el-table-column label="计件薪资" width="130">
@@ -46,7 +46,7 @@
                   v-model="row[`${month}_piecePay`]"
                   :min="0" :precision="2"
                   size="small" controls-position="right"
-                  style="width: 100%" />
+                  style="width: 100%" @change="dirty = true" />
               </template>
             </el-table-column>
             <el-table-column label="借支" width="120">
@@ -55,7 +55,7 @@
                   v-model="row[`${month}_loan`]"
                   :min="0" :precision="2"
                   size="small" controls-position="right"
-                  style="width: 100%" />
+                  style="width: 100%" @change="dirty = true" />
               </template>
             </el-table-column>
             <el-table-column label="罚款" width="120">
@@ -73,12 +73,12 @@
                   v-model="row[`${month}_toolsOther`]"
                   :min="0" :precision="2"
                   size="small" controls-position="right"
-                  style="width: 100%" />
+                  style="width: 100%" @change="dirty = true" />
               </template>
             </el-table-column>
             <el-table-column label="备注" min-width="120">
               <template #default="{ row }">
-                <el-input v-model="row[`${month}_remark`]" size="small" placeholder="备注" />
+                <el-input v-model="row[`${month}_remark`]" size="small" placeholder="备注" @change="dirty = true" />
               </template>
             </el-table-column>
           </el-table-column>
@@ -101,10 +101,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 import { listProjects } from '@/api/project'
 import { queryWorkDays, batchSaveWorkDays } from '@/api/workDay'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const projects = ref([])
 const projectId = ref('')
@@ -113,12 +114,13 @@ const currentYear = now.getFullYear()
 const currentMonth = String(now.getMonth() + 1).padStart(2, '0')
 const startMonth = ref(`${currentYear}-${currentMonth}`)
 const endMonth = ref(`${currentYear}-${currentMonth}`)
+const dirty = ref(false)
 const loading = ref(false)
 const saving = ref(false)
 const months = ref([])
 const tableData = ref([])
 const pageNum = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(10)
 const total = ref(0)
 const pagedData = computed(() => {
   const start = (pageNum.value - 1) * pageSize.value
@@ -151,6 +153,7 @@ async function handleQuery() {
     months.value = res.data.months || []
 
     // Build flat table data
+    dirty.value = false
     tableData.value = (res.data.employees || []).map(emp => {
       const row = {
         employeeId: emp.employeeId,
@@ -197,6 +200,7 @@ async function handleSave() {
       })
     })
     await batchSaveWorkDays(batch)
+    dirty.value = false
     ElMessage.success('保存成功')
   } catch (e) {
     // handled by interceptor
@@ -204,4 +208,26 @@ async function handleSave() {
     saving.value = false
   }
 }
+
+// 切换路由/关闭页面时提醒
+onBeforeRouteLeave((to, from, next) => {
+  if (dirty.value) {
+    ElMessageBox.confirm('有未保存的数据，确定离开吗？', '提示', {
+      confirmButtonText: '确定离开',
+      cancelButtonText: '继续编辑',
+      type: 'warning'
+    }).then(() => next()).catch(() => next(false))
+  } else {
+    next()
+  }
+})
+
+function handleBeforeUnload(e) {
+  if (dirty.value) {
+    e.preventDefault()
+    e.returnValue = ''
+  }
+}
+onMounted(() => window.addEventListener('beforeunload', handleBeforeUnload))
+onBeforeUnmount(() => window.removeEventListener('beforeunload', handleBeforeUnload))
 </script>

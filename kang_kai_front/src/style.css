@@ -21,6 +21,19 @@ html, body, #app {
   --el-table-border-color: #b8bcc2;
 }
 
+/* 侧边栏不显示滚动条 */
+.el-aside {
+  overflow: hidden !important;
+}
+
+/* 台账合计行 */
+.el-table .summary-row > td {
+  font-weight: 600 !important;
+}
+.el-table .summary-row > td {
+  font-weight: 600 !important;
+}
+
 
 
 

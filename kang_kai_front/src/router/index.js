@@ -49,6 +49,12 @@ const routes = [
         name: 'LedgerDetail',
         component: () => import('@/views/ledger/LedgerDetail.vue'),
         meta: { title: '台账明细' }
+      },
+      {
+        path: 'statistics',
+        name: 'Statistics',
+        component: () => import('@/views/statistics/Statistics.vue'),
+        meta: { title: '数据统计' }
       }
     ]
   }

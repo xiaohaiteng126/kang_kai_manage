@@ -1,6 +1,6 @@
 <template>
   <el-container style="height: 100%">
-    <el-aside width="220px" style="background: #304156; overflow-x: hidden">
+    <el-aside width="180px" style="background: #304156">
       <div class="logo">
         <h3>康之凯台账管理</h3>
       </div>
@@ -35,6 +35,10 @@
         <el-menu-item index="/ledger">
           <el-icon><Document /></el-icon>
           <span>台账明细</span>
+        </el-menu-item>
+        <el-menu-item index="/statistics">
+          <el-icon><TrendCharts /></el-icon>
+          <span>数据统计</span>
         </el-menu-item>
       </el-menu>
     </el-aside>

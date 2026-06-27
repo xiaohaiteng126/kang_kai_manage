@@ -84,7 +84,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 const tableData = ref([])
 const loading = ref(false)
 const pageNum = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(10)
 const total = ref(0)
 const pagedData = computed(() => {
   const start = (pageNum.value - 1) * pageSize.value
